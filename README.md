@@ -7,3 +7,5 @@ Actually, its original complete path is avro/lang/java/ipc/src/test/java/org/apa
 after I import the system folder, it seems like the complete path is avro\lang\java\avro\avro\TestProtocolGeneric.java. 
 
 3. task 4 is a failed attemptation, but I will never give it up. We ll see~ 
+
+4. task 4 is completed now may
