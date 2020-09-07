@@ -1,6 +1,7 @@
 package org.apache.avro.myClass;
 
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,38 +30,36 @@ public class task4ByJapa {
 
 	public static void main(String[] args) throws Exception {
 
-		CompilationUnit cu1 = StaticJavaParser.parse(new FileInputStream(TestDataFileMeta_FILE_PATH));
-		CompilationUnit cu2 = StaticJavaParser.parse(new FileInputStream(TestResolvingGrammarGenerator_FILE_PATH));
-		CompilationUnit cu3 = StaticJavaParser.parse(new FileInputStream(TestProtocolGeneric_FILE_PATH));
-
-
 		CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
 		combinedTypeSolver.add(new ReflectionTypeSolver());
-
-		//combinedTypeSolver.add(new JavaParserTypeSolver("src/main/java"));
-		//combinedTypeSolver.add(new ReflectionTypeSolver());
+		
+		combinedTypeSolver.add(new JavaParserTypeSolver("src"));
+		combinedTypeSolver.add(new JavaParserTypeSolver(new File("avro")));
 		
 		JavaSymbolSolver symbolSolver = new JavaSymbolSolver(combinedTypeSolver);
 		StaticJavaParser.getConfiguration().setSymbolResolver(symbolSolver);
 		
 		
+		CompilationUnit cu1 = StaticJavaParser.parse(new FileInputStream(TestDataFileMeta_FILE_PATH));
+		CompilationUnit cu2 = StaticJavaParser.parse(new FileInputStream(TestResolvingGrammarGenerator_FILE_PATH));
+		CompilationUnit cu3 = StaticJavaParser.parse(new FileInputStream(TestProtocolGeneric_FILE_PATH));
 		
 		
 		List<String> assertionStmt = new ArrayList<>();
 		VoidVisitor<List<String>> assertStmtCollector = new MethodCallExprPrinter();
 
+		System.out.println("Methond invoked in assertion statement printed from TestDataFileMeta.java:\n");
 		assertStmtCollector.visit(cu1, assertionStmt);
-		//System.out.println("Assertion Statement Printed from TestDataFileMeta.java:");
 		//assertionStmt.forEach(n -> System.out.println(n + "()"));
 
 		assertionStmt.clear();
+		System.out.println("Methond invoked in Assertion Statement Printed from TestResolvingGrammarGenerator.java:\n");
 		assertStmtCollector.visit(cu2, assertionStmt);
-		//System.out.println("\nAssertion Statement Printed from TestResolvingGrammarGenerator.java:");
 		//assertionStmt.forEach(n -> System.out.println(n + "()"));
 
 		assertionStmt.clear();
+		System.out.println("Methond invoked in Assertion Statement Printed from TestProtocolGeneric.java:");
 		assertStmtCollector.visit(cu3, assertionStmt);
-		//System.out.println("\nAssertion Statement Printed from TestProtocolGeneric.java:");
 		//assertionStmt.forEach(n -> System.out.println(n + "()"));
 
 	}
@@ -81,11 +80,25 @@ public class task4ByJapa {
 					if (m2.matches()) {
 						collector.add(temp2);
 						
+						mce.findAll(MethodCallExpr.class).forEach(ivkmce->{
+							String str=ivkmce.toString();
+							System.out.println(str);
+							System.out.println(ivkmce.resolve().getQualifiedSignature());
+							
+							//System.out.println(ivkmce.calculateResolvedType().toString());
+							//System.out.println(ivkmce.resolve().getQualifiedSignature().toString());
+							
+							//System.out.println(ivkmce.resolve().getQualifiedName().toString());
+							//ResolvedType resolvedType = ivkmce.calculateResolvedType();
+				            //System.out.println(ivkmce.toString() + " is a: " + resolvedType);
+						});
+						
+						
 						//System.out.println(mce.toMethodCallExpr());
 						
 						//System.out.println(mce.toMethodReferenceExpr());
-						TypeSolver typeSolver1 = new ReflectionTypeSolver();
-						showReferenceTypeDeclaration(typeSolver1.solveType(temp2));
+						//TypeSolver typeSolver1 = new ReflectionTypeSolver();
+						//showReferenceTypeDeclaration(typeSolver1.solveType(temp2));
 						
 						//System.out.println(resolvedType);
 						// System.out.println(mce.resolve().getQualifiedName());
@@ -93,9 +106,6 @@ public class task4ByJapa {
 				});
 			}
 
-			// md.findAll(MethodCallExpr.class).forEach(mce->System.out.println("mce+"+mce.toString()));
-			// System.out.println("x+"+x);
-			// assert.*\(.*\)$
 		}
 	}
 	 public static void showReferenceTypeDeclaration(ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration) {
